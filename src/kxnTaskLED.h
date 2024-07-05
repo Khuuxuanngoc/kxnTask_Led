@@ -3,8 +3,10 @@
 #include "kxnTask.h"
 
 DEFINE_TASK_STATE(kxnTaskLED){
-    kxnTaskLED_ON, kxnTaskLED_ON_repeat,
-    kxnTaskLED_OFF,kxnTaskLED_OFF_repeat,
+    kxnTaskLED_ON,
+    kxnTaskLED_OFF,
+    kxnTaskLED_ON_1TIME,
+    kxnTaskLED_OFF_1TIME,
 };
 
 CREATE_TASK(kxnTaskLED)
@@ -12,8 +14,7 @@ CREATE_TASK(kxnTaskLED)
 uint8_t pin;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
-unsigned      repeatTimes;
-unsigned int  count;
+
 void setup(uint8_t pin_PA)
 {
     this->pin=pin_PA;
@@ -37,20 +38,11 @@ void loop()
         setState(kxnTaskLED_ON);
         break;
 
-    case kxnTaskLED_ON_repeat:
+    case kxnTaskLED_ON_1TIME:
         digitalWrite(this->pin, 1);
         kDelay(timeDelayON);
-        setState(kxnTaskLED_OFF_repeat);
-        this->count++;
+        stop();
         break;
-
-    case kxnTaskLED_OFF_repeat:
-        digitalWrite(this->pin, 0);
-        kDelay(timeDelayOFF);
-        setState(kxnTaskLED_ON_repeat);
-        this->count++;
-        break;
-
 
     default:
         break;
@@ -63,11 +55,10 @@ void start()
     setState(kxnTaskLED_ON);
 }
 
-
-void start_has_repeat()
+void start1()
 {
     kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON_repeat);
+    setState(kxnTaskLED_ON_1TIME);
 }
 
 void stop()
@@ -75,22 +66,18 @@ void stop()
     kDelay(0);
     setStateIdle();
 }
+
 void write(unsigned long delayON, unsigned long delayOFF){
     this->start();
     this->timeDelayON=delayON;
     this->timeDelayOFF=delayOFF;
 }
 
-void write(unsigned long delayON, unsigned long delayOFF, unsigned int repeatTimes){
-    this->start_has_repeat();
+void write(unsigned long delayON){
+    this->start1();
     this->timeDelayON=delayON;
-    this->timeDelayOFF=delayOFF;
-    this->repeatTimes=repeatTimes;
-    if(this->count==repeatTimes) {
-        this->stop();
-        this->count=0; 
-    }
 }
 
-
 END
+
+

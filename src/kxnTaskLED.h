@@ -40,13 +40,15 @@ void loop()
     case kxnTaskLED_ON_repeat:
         digitalWrite(this->pin, 1);
         kDelay(timeDelayON);
-        setState(kxnTaskLED_OFF);
+        setState(kxnTaskLED_OFF_repeat);
+        this->count++;
         break;
 
     case kxnTaskLED_OFF_repeat:
         digitalWrite(this->pin, 0);
         kDelay(timeDelayOFF);
-        setState(kxnTaskLED_ON);
+        setState(kxnTaskLED_ON_repeat);
+        this->count++;
         break;
 
 
@@ -61,6 +63,13 @@ void start()
     setState(kxnTaskLED_ON);
 }
 
+
+void start_has_repeat()
+{
+    kxnTaskManager.add(this);
+    setState(kxnTaskLED_ON_repeat);
+}
+
 void stop()
 {
     kDelay(0);
@@ -72,11 +81,16 @@ void write(unsigned long delayON, unsigned long delayOFF){
     this->timeDelayOFF=delayOFF;
 }
 
-void write(unsigned long delayON, unsigned long delayOFF, int repeatTimes){
-    this->start();
+void write(unsigned long delayON, unsigned long delayOFF, unsigned int repeatTimes){
+    this->start_has_repeat();
     this->timeDelayON=delayON;
     this->timeDelayOFF=delayOFF;
     this->repeatTimes=repeatTimes;
-    if(this->count==repeatTimes) this->stop();
+    if(this->count==repeatTimes) {
+        this->stop();
+        this->count=0; 
+    }
 }
+
+
 END

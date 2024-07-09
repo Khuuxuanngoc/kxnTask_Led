@@ -5,8 +5,8 @@
 DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_ON,
     kxnTaskLED_OFF,
-    kxnTaskLED_ON_1TIME,
-    kxnTaskLED_OFF_1TIME,
+    kxnTaskLED_ON_1TIMES,
+    kxnTaskLED_OFF_1TIMES,
 };
 
 CREATE_TASK(kxnTaskLED)
@@ -14,35 +14,63 @@ CREATE_TASK(kxnTaskLED)
 uint8_t pin;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
+enum state
+{
+    blynkforever,
+    blynkthenstop,
+    on1times
+};
 
 void setup(uint8_t pin_PA)
 {
-    this->pin=pin_PA;
+    this->pin = pin_PA;
     pinMode(this->pin, OUTPUT);
     stop();
 }
 
 void loop()
 {
-    switch (getState())
+    switch (this->state)
     {
-    case kxnTaskLED_ON:
-        digitalWrite(this->pin, 1);
-        kDelay(timeDelayON);
-        setState(kxnTaskLED_OFF);
-        break;
+    case blynkforever:
 
-    case kxnTaskLED_OFF:
-        digitalWrite(this->pin, 0);
-        kDelay(timeDelayOFF);
-        setState(kxnTaskLED_ON);
-        break;
+        switch (getState())
+        {
+        case kxnTaskLED_ON:
+            digitalWrite(this->pin, 1);
+            kDelay(timeDelayON);
+            setState(kxnTaskLED_OFF);
+            break;
 
-    case kxnTaskLED_ON_1TIME:
-        digitalWrite(this->pin, 1);
-        kDelay(timeDelayON);
-        stop();
+        case kxnTaskLED_OFF:
+            digitalWrite(this->pin, 0);
+            kDelay(timeDelayOFF);
+            setState(kxnTaskLED_ON);
+            break;
+
+        default:
+            break;
+        }
+
         break;
+    case on1times:
+
+        switch (getState())
+        {
+        case kxnTaskLED_ON_1TIMES:
+            digitalWrite(this->pin, 1);
+            kDelay(timeDelayON);
+            setState(kxnTaskLED_OFF_1TIMES);
+            break;
+
+        case kxnTaskLED_OFF_1TIMES:
+            digitalWrite(this->pin, 0);
+            stop();
+            break;
+
+        default:
+            break;
+        }
 
     default:
         break;
@@ -52,13 +80,6 @@ void loop()
 void start()
 {
     kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON);
-}
-
-void start1()
-{
-    kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON_1TIME);
 }
 
 void stop()
@@ -67,17 +88,25 @@ void stop()
     setStateIdle();
 }
 
-void write(unsigned long delayON, unsigned long delayOFF){
+void writeOnForever(unsigned long delayON, unsigned long delayOFF)
+{
+    setState(kxnTaskLED_ON);
     this->start();
-    this->timeDelayON=delayON;
-    this->timeDelayOFF=delayOFF;
+    this->timeDelayON = delayON;
+    this->timeDelayOFF = delayOFF;
 }
 
-void write(unsigned long delayON){
-    this->start1();
-    this->timeDelayON=delayON;
+void writeOn1times(unsigned long delayON, unsigned long delayOFF)
+{
+    setState(kxnTaskLED_ON_1TIMES);
+    this->start();
+    this->timeDelayON = delayON;
+    this->timeDelayOFF = delayOFF;
 }
 
 END
-
-
+    /**
+     * modified at 2024/07/08
+     * delete test led on 1 times
+     * create testcode3.h
+     */

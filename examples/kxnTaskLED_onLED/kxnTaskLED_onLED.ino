@@ -1,4 +1,4 @@
-#include "kxnTaskLED.h"
+#include "kxnTaskLED_kxn.h"
 
 kxnTaskLED kxnTaskLED1;
 
@@ -8,7 +8,8 @@ void loop();
 void setup() {
   Serial.begin(9600);
   kxnTaskLED1.setup(11);
-  kxnTaskLED1.writeOn1times(1000,1000);
+  // kxnTaskLED1.write(200,1000);
+  kxnTaskLED1.write(2000);
 }
 
 void loop() {

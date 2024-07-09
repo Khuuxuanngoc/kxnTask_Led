@@ -5,6 +5,8 @@
 DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_ON,
     kxnTaskLED_OFF,
+    kxnTaskLED_ON_1TIME,
+    kxnTaskLED_OFF_1TIME,
 };
 
 CREATE_TASK(kxnTaskLED)
@@ -36,6 +38,17 @@ void loop()
         setState(kxnTaskLED_ON);
         break;
 
+    case kxnTaskLED_ON_1TIME:
+        digitalWrite(this->pin, 1);
+        kDelay(timeDelayON);
+        setState(kxnTaskLED_OFF_1TIME);
+        break;
+
+    case kxnTaskLED_OFF_1TIME:
+        digitalWrite(this->pin, 0);
+        setStateStop();
+        break;
+
     default:
         break;
     }
@@ -44,7 +57,6 @@ void loop()
 void start()
 {
     kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON);
 }
 
 void stop()
@@ -56,11 +68,17 @@ void stop()
 void write(unsigned long delayON, unsigned long delayOFF)
 {
     this->start();
+    setState(kxnTaskLED_ON);
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
 }
 
-
+void write(unsigned long delayON)
+{
+    this->start();
+    setState(kxnTaskLED_ON_1TIME);
+    this->timeDelayON = delayON;
+}
 
 END
     /**

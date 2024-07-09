@@ -67,8 +67,8 @@ END
      * create testcode3.h
      */
     DEFINE_TASK_STATE(blinkHasRepeat){
-        kxnTaskLED_ON,
-        kxnTaskLED_OFF,
+        kxnTaskLED_ON1,
+        kxnTaskLED_OFF1,
         kxnTaskLED_COUNT,
     };
 
@@ -90,13 +90,13 @@ void loop()
 {
     switch (getState())
     {
-    case kxnTaskLED_ON:
+    case kxnTaskLED_ON1:
         digitalWrite(this->pin, 1);
         kDelay(timeDelayON);
         setState(kxnTaskLED_COUNT);
         break;
 
-    case kxnTaskLED_OFF:
+    case kxnTaskLED_OFF2:
         digitalWrite(this->pin, 0);
         kDelay(timeDelayOFF);
         setState(kxnTaskLED_ON);

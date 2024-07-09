@@ -11,8 +11,13 @@ void setup(void){
         case kxnTaskLED_ON_1TIME:
         digitalWrite(this->pin, 1);
         kDelay(timeDelayON);
-        stop();
+        setState(kxnTaskLED_OFF_1TIME);
         break;
+
+        case kxnTaskLED_OFF_1TIME:
+        digitalWrite(this->pin, 0);
+        stop();
+        break;  
     
     default:
         break;
@@ -23,4 +28,5 @@ void setup(void){
 void write(unsigned long delayON){
     this->start1();
     this->timeDelayON=delayON;
+    setState(kxnTaskLED_ON_1TIME);
 }

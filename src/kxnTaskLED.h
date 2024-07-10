@@ -5,6 +5,8 @@
 DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_ON,
     kxnTaskLED_OFF,
+    kxnTaskLED_ON_1TIMES,
+    kxnTaskLED_OFF_1TIMES,
 };
 
 CREATE_TASK(kxnTaskLED)
@@ -36,6 +38,17 @@ void loop()
         setState(kxnTaskLED_ON);
         break;
 
+    case kxnTaskLED_ON_1TIMES:
+        digitalWrite(this->pin, 1);
+        kDelay(timeDelayON);
+        setState(kxnTaskLED_OFF_1TIMES);
+        break;
+
+    case kxnTaskLED_OFF_1TIMES:
+        digitalWrite(this->pin, 0);
+        setStateStop();
+        break;
+
     default:
         break;
     }
@@ -44,7 +57,6 @@ void loop()
 void start()
 {
     kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON);
 }
 
 void stop()
@@ -56,15 +68,17 @@ void stop()
 void write(unsigned long delayON, unsigned long delayOFF)
 {
     this->start();
+    setState(kxnTaskLED_ON);
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
 }
 
-
+void write(unsigned long delayON)
+{
+    this->start();
+    setState(kxnTaskLED_ON_1TIMES);
+    this->timeDelayON = delayON;
+}
 
 END
-    /**
-     * modified at 2024/07/08
-     * delete test led on 1 times
-     * create testcode3.h
-     */
+

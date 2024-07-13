@@ -17,7 +17,7 @@ CREATE_TASK(kxnTaskLED)
 uint8_t pin;
 uint8_t countON = 1;
 uint8_t countOFF;
-volatile uint8_t state;
+uint8_t state;
 uint8_t ON = 1;
 uint8_t OFF = 0;
 unsigned long timeDelayON;
@@ -110,8 +110,7 @@ void start()
 
 void stop()
 {
-    digitalWrite(this->pin,0);
-    this->state=this->OFF;
+    this->state = this->OFF;
     kDelay(0);
     setStateIdle();
 }
@@ -120,6 +119,7 @@ void write(unsigned long delayON, unsigned long delayOFF)
 {
     this->start();
     setState(kxnTaskLED_ON);
+    this->state = this->ON;
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
 }
@@ -128,6 +128,7 @@ void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
 {
     this->countOFF = countOFF;
     this->start();
+    this->state = this->ON;
     setState(kxnTaskLED_ON_COUNT);
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
@@ -136,6 +137,7 @@ void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
 void write(unsigned long delayON)
 {
     this->start();
+    this->state = this->ON;
     setState(kxnTaskLED_ON_1TIMES);
     this->timeDelayON = delayON;
 }

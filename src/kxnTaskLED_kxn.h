@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kxnTask.h"
+#include "Arduino.h"
 
 DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_ON,
@@ -14,13 +15,17 @@ DEFINE_TASK_STATE(kxnTaskLED){
 CREATE_TASK(kxnTaskLED)
 /*Add your variable here*/
 uint8_t pin;
-uint8_t countON = 0;
+uint8_t countON = 1;
 uint8_t countOFF;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
 
 void setup(uint8_t pin_PA)
 {
+
+    // Serial.begin(9600);
+    // Serial.println("DANG TRONG HAM SETUP");
+
     this->pin = pin_PA;
     pinMode(this->pin, OUTPUT);
     stop();
@@ -28,6 +33,9 @@ void setup(uint8_t pin_PA)
 
 void loop()
 {
+    
+    // Serial.println("DANG TRONG HAM LOOP");
+
     switch (getState())
     {
     case kxnTaskLED_ON:
@@ -61,16 +69,20 @@ void loop()
 
     case kxnTaskLED_OFF_COUNT:
 
-        if (this->countON <= this->countOFF)
+        // Serial.begin(9600);
+        // Serial.println("DANG TRONG HAM kxnTaskLED_OFF_COUNT");
+        if (this->countON<this->countOFF)
         {
-            digitalWrite(this->pin, 0);
-            kDelay(timeDelayOFF);
-            this->countON++;
-            setState(kxnTaskLED_ON_COUNT);
+        digitalWrite(this->pin, 0);
+        kDelay(timeDelayOFF);
+        this->countON++;
+        setState(kxnTaskLED_ON_COUNT);
         }
-        else
+        else 
+        {
+            digitalWrite(this->pin,0);
             setStateStop();
-
+        }
         break;
 
     default:
@@ -99,9 +111,9 @@ void write(unsigned long delayON, unsigned long delayOFF)
 
 void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
 {
-    this->countOFF == countOFF;
+    this->countOFF = countOFF;
     this->start();
-    setState(kxnTaskLED_ON);
+    setState(kxnTaskLED_ON_COUNT);
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
 }

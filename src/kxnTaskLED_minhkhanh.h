@@ -16,17 +16,14 @@ DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_MODE_ON_1TIMES,
     kxnTaskLED_MODE_ON_COUNT,
     kxnTaskLED_MODE_STOP,
-    // kxnTaskLED_check_status,
+    
 };
 
 CREATE_TASK(kxnTaskLED)
-/*Add your variable here*/
+
 uint8_t pin;
 uint8_t countON = 1;
 uint8_t countOFF;
-// uint8_t state;
-// uint8_t ON = 1;
-// uint8_t OFF = 0;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
 uint8_t LED_mode;
@@ -34,20 +31,14 @@ uint8_t LED_mode;
 void setup(uint8_t pin_PA)
 {
 
-    // Serial.begin(9600);
-    // Serial.println("DANG TRONG HAM SETUP");
-
     this->pin = pin_PA;
     pinMode(this->pin, OUTPUT);
     digitalWrite(this->pin, 0);
-    // this->state = this->OFF;
     stop();
 }
 
 void loop()
 {
-
-    // Serial.println("DANG TRONG HAM LOOP");
 
     switch (getState())
     {
@@ -59,7 +50,6 @@ void loop()
         break;
 
     case kxnTaskLED_OFF:
-        // this->state = this->OFF;
         digitalWrite(this->pin, 0);
         kDelay(timeDelayOFF);
         setState(kxnTaskLED_ON);
@@ -72,9 +62,7 @@ void loop()
         break;
 
     case kxnTaskLED_OFF_1TIMES:
-        // this->state = this->OFF;
         digitalWrite(this->pin, 0);
-        // setStateStop();
         this->stop();
         break;
 
@@ -86,12 +74,9 @@ void loop()
 
     case kxnTaskLED_OFF_COUNT:
 
-        // Serial.begin(9600);
-        // Serial.println("DANG TRONG HAM kxnTaskLED_OFF_COUNT");
         if (this->countON < this->countOFF)
         {
             digitalWrite(this->pin, 0);
-            // this->state = this->OFF;
             kDelay(timeDelayOFF);
             this->countON++;
             setState(kxnTaskLED_ON_COUNT);
@@ -102,11 +87,6 @@ void loop()
             kDelay(timeDelayOFF);
             this->countON = 1;
             setState(kxnTaskLED_STOP);
-            // this->state = this->OFF;
-
-            // setStateStop();
-            // setStateIdle();
-            // this->stop();
         }
         break;
 
@@ -116,12 +96,6 @@ void loop()
 
         break;
 
-    // case kxnTaskLED_check_status:
-    //     if (this->state == this->ON)
-    //         return true;
-    //     else
-    //         return false;
-    //     break;
     default:
         break;
     }
@@ -146,7 +120,6 @@ void write(unsigned long delayON, unsigned long delayOFF)
         this->start();
         this->LED_mode = kxnTaskLED_MODE_ON;
         setState(kxnTaskLED_ON);
-        // this->state = this->ON;
         this->timeDelayON = delayON;
         this->timeDelayOFF = delayOFF;
     }
@@ -159,7 +132,6 @@ void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
         this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
         this->countOFF = countOFF;
         this->start();
-        // this->state = this->ON;
         setState(kxnTaskLED_ON_COUNT);
         this->timeDelayON = delayON;
         this->timeDelayOFF = delayOFF;
@@ -172,7 +144,6 @@ void write(unsigned long delayON)
     {
         this->LED_mode = kxnTaskLED_MODE_ON_1TIMES;
         this->start();
-        // this->state = this->ON;
         setState(kxnTaskLED_ON_1TIMES);
         this->timeDelayON = delayON;
     }
@@ -180,13 +151,12 @@ void write(unsigned long delayON)
 
 bool isRunning()
 {
-    if (this->LED_mode == kxnTaskLED_MODE_ON ||
+    if 
+    (
+        this->LED_mode == kxnTaskLED_MODE_ON ||
         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
-        this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
-
-        // if (getState() == kxnTaskLED_MODE_ON ||
-        //     getState() == kxnTaskLED_MODE_ON_1TIMES ||
-        //     getState() == kxnTaskLED_MODE_ON_COUNT)
+        this->LED_mode == kxnTaskLED_MODE_ON_COUNT
+    )
         return true;
     else
         return false;

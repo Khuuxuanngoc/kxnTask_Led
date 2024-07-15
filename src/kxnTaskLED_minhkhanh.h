@@ -3,16 +3,19 @@
 #include "kxnTask.h"
 
 DEFINE_TASK_STATE(kxnTaskLED){
+
     kxnTaskLED_ON,
     kxnTaskLED_OFF,
     kxnTaskLED_ON_1TIMES,
     kxnTaskLED_OFF_1TIMES,
     kxnTaskLED_ON_COUNT,
     kxnTaskLED_OFF_COUNT,
+    kxnTaskLED_STOP,
 
     kxnTaskLED_MODE_ON,
     kxnTaskLED_MODE_ON_1TIMES,
     kxnTaskLED_MODE_ON_COUNT,
+    kxnTaskLED_MODE_STOP,
     // kxnTaskLED_check_status,
 };
 
@@ -21,9 +24,9 @@ CREATE_TASK(kxnTaskLED)
 uint8_t pin;
 uint8_t countON = 1;
 uint8_t countOFF;
-uint8_t state;
-uint8_t ON = 1;
-uint8_t OFF = 0;
+// uint8_t state;
+// uint8_t ON = 1;
+// uint8_t OFF = 0;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
 uint8_t LED_mode;
@@ -37,7 +40,7 @@ void setup(uint8_t pin_PA)
     this->pin = pin_PA;
     pinMode(this->pin, OUTPUT);
     digitalWrite(this->pin, 0);
-    this->state = this->OFF;
+    // this->state = this->OFF;
     stop();
 }
 
@@ -56,6 +59,7 @@ void loop()
         break;
 
     case kxnTaskLED_OFF:
+        // this->state = this->OFF;
         digitalWrite(this->pin, 0);
         kDelay(timeDelayOFF);
         setState(kxnTaskLED_ON);
@@ -68,8 +72,10 @@ void loop()
         break;
 
     case kxnTaskLED_OFF_1TIMES:
+        // this->state = this->OFF;
         digitalWrite(this->pin, 0);
-        setStateStop();
+        // setStateStop();
+        this->stop();
         break;
 
     case kxnTaskLED_ON_COUNT:
@@ -85,7 +91,7 @@ void loop()
         if (this->countON < this->countOFF)
         {
             digitalWrite(this->pin, 0);
-            this->state = this->OFF;
+            // this->state = this->OFF;
             kDelay(timeDelayOFF);
             this->countON++;
             setState(kxnTaskLED_ON_COUNT);
@@ -93,8 +99,21 @@ void loop()
         else
         {
             digitalWrite(this->pin, 0);
-            setStateStop();
+            kDelay(timeDelayOFF);
+            this->countON = 1;
+            setState(kxnTaskLED_STOP);
+            // this->state = this->OFF;
+
+            // setStateStop();
+            // setStateIdle();
+            // this->stop();
         }
+        break;
+
+    case kxnTaskLED_STOP:
+
+        this->stop();
+
         break;
 
     // case kxnTaskLED_check_status:
@@ -115,7 +134,7 @@ void start()
 
 void stop()
 {
-    this->state = this->OFF;
+    this->LED_mode = kxnTaskLED_MODE_STOP;
     kDelay(0);
     setStateIdle();
 }
@@ -127,7 +146,7 @@ void write(unsigned long delayON, unsigned long delayOFF)
         this->start();
         this->LED_mode = kxnTaskLED_MODE_ON;
         setState(kxnTaskLED_ON);
-        this->state = this->ON;
+        // this->state = this->ON;
         this->timeDelayON = delayON;
         this->timeDelayOFF = delayOFF;
     }
@@ -137,13 +156,13 @@ void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
 {
     if (this->LED_mode != kxnTaskLED_MODE_ON_COUNT)
     {
-    this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
-    this->countOFF = countOFF;
-    this->start();
-    this->state = this->ON;
-    setState(kxnTaskLED_ON_COUNT);
-    this->timeDelayON = delayON;
-    this->timeDelayOFF = delayOFF;
+        this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
+        this->countOFF = countOFF;
+        this->start();
+        // this->state = this->ON;
+        setState(kxnTaskLED_ON_COUNT);
+        this->timeDelayON = delayON;
+        this->timeDelayOFF = delayOFF;
     }
 }
 
@@ -151,33 +170,26 @@ void write(unsigned long delayON)
 {
     if (this->LED_mode != kxnTaskLED_MODE_ON_1TIMES)
     {
-    this->LED_mode = kxnTaskLED_MODE_ON_1TIMES;
-    this->start();
-    this->state = this->ON;
-    setState(kxnTaskLED_ON_1TIMES);
-    this->timeDelayON = delayON;
+        this->LED_mode = kxnTaskLED_MODE_ON_1TIMES;
+        this->start();
+        // this->state = this->ON;
+        setState(kxnTaskLED_ON_1TIMES);
+        this->timeDelayON = delayON;
     }
 }
 
 bool isRunning()
 {
-    if (this->state == this->ON)
+    if (this->LED_mode == kxnTaskLED_MODE_ON ||
+        this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
+        this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
+
+        // if (getState() == kxnTaskLED_MODE_ON ||
+        //     getState() == kxnTaskLED_MODE_ON_1TIMES ||
+        //     getState() == kxnTaskLED_MODE_ON_COUNT)
         return true;
     else
         return false;
-
-    // this->start();
-    // setState(kxnTaskLED_check_status);
-    // while (this->state==this->ON)
-    // {
-    //     return true;
-    //     break;
-    // }
-    // while (this->state==this->OFF)
-    // {
-    //     return false;
-    //     break;
-    // }
 }
 
 END

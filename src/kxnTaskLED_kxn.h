@@ -144,7 +144,7 @@ bool isRunning()
 {
     if (this->state == this->ON)
         return true;
-    else
+    else if (this->state == this->OFF)
         return false;
 
     // this->start();

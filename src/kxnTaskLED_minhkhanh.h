@@ -9,6 +9,10 @@ DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_OFF_1TIMES,
     kxnTaskLED_ON_COUNT,
     kxnTaskLED_OFF_COUNT,
+
+    kxnTaskLED_MODE_ON,
+    kxnTaskLED_MODE_ON_1TIMES,
+    kxnTaskLED_MODE_ON_COUNT,
     // kxnTaskLED_check_status,
 };
 
@@ -22,6 +26,7 @@ uint8_t ON = 1;
 uint8_t OFF = 0;
 unsigned long timeDelayON;
 unsigned long timeDelayOFF;
+uint8_t LED_mode;
 
 void setup(uint8_t pin_PA)
 {
@@ -117,29 +122,41 @@ void stop()
 
 void write(unsigned long delayON, unsigned long delayOFF)
 {
-    this->start();
-    setState(kxnTaskLED_ON);
-    this->state = this->ON;
-    this->timeDelayON = delayON;
-    this->timeDelayOFF = delayOFF;
+    if (this->LED_mode != kxnTaskLED_MODE_ON)
+    {
+        this->start();
+        this->LED_mode = kxnTaskLED_MODE_ON;
+        setState(kxnTaskLED_ON);
+        this->state = this->ON;
+        this->timeDelayON = delayON;
+        this->timeDelayOFF = delayOFF;
+    }
 }
 
 void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
 {
+    if (this->LED_mode != kxnTaskLED_MODE_ON_COUNT)
+    {
+    this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
     this->countOFF = countOFF;
     this->start();
     this->state = this->ON;
     setState(kxnTaskLED_ON_COUNT);
     this->timeDelayON = delayON;
     this->timeDelayOFF = delayOFF;
+    }
 }
 
 void write(unsigned long delayON)
 {
+    if (this->LED_mode != kxnTaskLED_MODE_ON_1TIMES)
+    {
+    this->LED_mode = kxnTaskLED_MODE_ON_1TIMES;
     this->start();
     this->state = this->ON;
     setState(kxnTaskLED_ON_1TIMES);
     this->timeDelayON = delayON;
+    }
 }
 
 bool isRunning()

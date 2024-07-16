@@ -1,5 +1,6 @@
+#ifndef kxnTaskLED_h
+#define kxnTaskLED_h
 #pragma once
-
 #include "kxnTask.h"
 
 DEFINE_TASK_STATE(kxnTaskLED){
@@ -16,7 +17,7 @@ DEFINE_TASK_STATE(kxnTaskLED){
     kxnTaskLED_MODE_ON_1TIMES,
     kxnTaskLED_MODE_ON_COUNT,
     kxnTaskLED_MODE_STOP,
-    
+
 };
 
 CREATE_TASK(kxnTaskLED)
@@ -151,15 +152,14 @@ void write(unsigned long delayON)
 
 bool isRunning()
 {
-    if 
-    (
+    if (
         this->LED_mode == kxnTaskLED_MODE_ON ||
         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
-        this->LED_mode == kxnTaskLED_MODE_ON_COUNT
-    )
+        this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
         return true;
     else
         return false;
 }
 
 END
+#endif

@@ -7,22 +7,36 @@ void setup() {
   // test1.start();
   // test1.write(5000);
 }
-String str = "";
-unsigned long lastMillis, currentMillis;
-int interval;
+String Str = "";
+// unsigned long lastMillis, currentMillis;
+// int interval;
+
 void loop() {
   // currentMillis = millis();
   if (Serial.available()) {
-    str = Serial.readStringUntil('\n');
+    Str = Serial.readStringUntil('\n');
     // lastMillis = millis();
     // interval = str.toInt();
-    Serial.println("input_time " + str);
+
+    int firstSpace = Str.indexOf(' ');
+    String timeON = Str.substring(0, firstSpace);
+    String timeOFF = Str.substring(firstSpace + 1);
+
+
+    Serial.println("the ON times of the led is " + timeON);
+    Serial.println("the OFF times of the led is " + timeOFF);
+
+    test1.write(timeON.toInt(), timeOFF.toInt());
+
+    // Serial.println("input_time " + Str);
 
     // if (currentMillis - lastMillis >= interval)
     // {
     Serial.println(millis());
     // }
   }
-  test1.write(str.toInt());
+  // test1.write(Str.toInt());
+  // test1.write(timeON.toInt(), timeOFF.toInt());
+  // test1.write(1000, 1000);
   kxnTaskManager.run(millis());
 }

@@ -29,8 +29,7 @@
 #define test_lib_1__H
 
 #include "kxnTask.h"
-// #include "Arduino.h"
-
+typedef unsigned long ul_32t;
 class LED_Manager
 {
 private:
@@ -42,17 +41,21 @@ private:
 
 public:
     uint8_t LED_current_state;
-    LED_Manager(/* args */);
-    ~LED_Manager();
+    //     uint8_t timeON, timeOFF, lastTimeON, lastTimeOFF;
+    //     LED_ON_Manager(ul_32t timeCurrent, ul_32t timeLast);
+    //     LED_OFF_Manager(ul_32t timeCurrent, ul_32t timeLast);
+    //     // ~LED_Manager();
 };
 
-LED_Manager::LED_Manager(/* args */)
-{
-}
+// LED_Manager::LED_ON_Manager(ul_32t timeCurrent, ul_32t timeLast)
+// {
+//     timeON=timeCurrent;
 
-LED_Manager::~LED_Manager()
-{
-}
+// }
+
+// LED_Manager::~LED_Manager()
+// {
+// }
 
 DEFINE_TASK_STATE(test_lib_1){
     test_lib_1_ON,
@@ -60,13 +63,10 @@ DEFINE_TASK_STATE(test_lib_1){
 };
 
 CREATE_TASK(test_lib_1)
-/*Add your variable here*/
-// unsigned long
 uint8_t pin;
 
 void setup(uint8_t pin_PA)
 {
-    /*Add your code setup here*/
     this->pin = pin_PA;
     pinMode(this->pin, OUTPUT);
     digitalWrite(this->pin, 0);
@@ -78,113 +78,129 @@ void loop()
     switch (getState())
     {
     case test_lib_1_ON:
-        /*code*/
-
-        if (ptr->LED_current_state == this->LED_ON_1_TIMES)
-        {
-            digitalWrite(this->pin, HIGH);
-            kDelay(this->current_delayON);
-            setState(test_lib_1_OFF);
-            // digitalWrite(this->pin, LOW);
-            // setStateIdle();
-        }
+        this->LED_ON();
+        kDelay(this->current_delayON);
+        setState(test_lib_1_OFF);
         break;
 
     case test_lib_1_OFF:
-        /*code*/
-        // digitalWrite(this->pin, LOW);
-        // kDelay(1000);
-        // setState(test_lib_1_ON);
-        if (ptr->LED_current_state == this->LED_ON_1_TIMES)
+        this->LED_OFF();
+        kDelay(this->current_delayOFF);
+
+        if (ptr->LED_current_state == this->LED_ON_LOOP_FOREVER ||
+            ptr->LED_current_state == this->LED_ON_LOOP_FORTIMES)
         {
-            digitalWrite(this->pin, LOW);
-            setStateIdle();
+            setState(test_lib_1_ON);
         }
-            // kDelay(this->current_delayON);
-            // setState(test_lib_1_OFF);
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    void start()
-    {
-        kxnTaskManager.add(this);
-        setState(test_lib_1_ON);
-    }
-
-    void stop()
-    {
-        kDelay(0);
-        setStateIdle();
-    }
-
-    void runFast()
-    {
-    }
-
-    // void write(unsigned long delayON, unsigned long delayOFF)
-    // {
-    //     if (this->LED_mode != kxnTaskLED_MODE_ON)
-    //     {
-    //         this->start();
-    //         this->LED_mode = kxnTaskLED_MODE_ON;
-    //         setState(kxnTaskLED_ON);
-    //         this->timeDelayON = delayON;
-    //         this->timeDelayOFF = delayOFF;
-    //     }
-    // }
-
-    // void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
-    // {
-    //     if (this->LED_mode != kxnTaskLED_MODE_ON_COUNT)
-    //     {
-    //         this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
-    //         this->countOFF = countOFF;
-    //         this->start();
-    //         setState(kxnTaskLED_ON_COUNT);
-    //         this->timeDelayON = delayON;
-    //         this->timeDelayOFF = delayOFF;
-    //     }
-    // }
-
-    // Bật một lần xong rồi tắt
-
-    typedef enum
-    {
-        LED_ON_1_TIMES = 100,
-    } LED_state;
-
-    LED_Manager led_manager;
-    LED_Manager *ptr = &led_manager;
-    unsigned long current_delayON, last_delayON;
-    void write(unsigned long delayON)
-    {
-        
-        ptr->LED_current_state = this->LED_ON_1_TIMES;
-
-        this->last_delayON = this->current_delayON;
-
-        this->current_delayON = delayON;
-
-        if (this->current_delayON != this->last_delayON)
+        else
         {
             this->stop();
-            this->start();
         }
-    }
 
-    // bool isRunning()
-    // {
-    //     if (
-    //         this->LED_mode == kxnTaskLED_MODE_ON ||
-    //         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
-    //         this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
-    //         return true;
-    //     else
-    //         return false;
-    // }
-    END
+        break;
+
+    default:
+        break;
+    }
+}
+
+void start()
+{
+    kxnTaskManager.add(this);
+    setState(test_lib_1_ON);
+}
+
+void stop()
+{
+    kDelay(0);
+    setStateIdle();
+}
+
+void runFast()
+{
+}
+
+// Nhấp nháy
+void write(unsigned long delayON, unsigned long delayOFF)
+{
+    ptr->LED_current_state = this->LED_ON_LOOP_FOREVER;
+
+    this->last_delayON = this->current_delayON;
+    this->last_delayOFF = this->current_delayOFF;
+    this->current_delayON = delayON;
+    this->current_delayOFF = delayOFF;
+
+    if (this->current_delayON != this->last_delayON && this->current_delayOFF != this->last_delayOFF )
+    {
+        this->stop();
+        this->start();
+    }
+}
+
+// Nhấp nháy theo số lần rồi tắt
+// void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
+// {
+//     ptr->LED_current_state = this->LED_ON_LOOP_FORTIMES;
+
+//     this->last_delayON = this->current_delayON;
+
+//     this->current_delayON = delayON;
+
+//     if (this->current_delayON != this->last_delayON)
+//     {
+//         this->stop();
+//         this->start();
+//     }
+// }
+
+typedef enum
+{
+    LED_ON_1_TIMES = 100,
+    LED_ON_LOOP_FOREVER,
+    LED_ON_LOOP_FORTIMES,
+} LED_state;
+
+LED_Manager led_manager;
+LED_Manager *ptr = &led_manager;
+
+unsigned long current_delayON, last_delayON, current_delayOFF, last_delayOFF;
+
+// Bật một lần xong rồi tắt
+void write(unsigned long delayON)
+{
+
+    ptr->LED_current_state = this->LED_ON_1_TIMES;
+
+    this->last_delayON = this->current_delayON;
+    this->last_delayOFF = this->current_delayOFF;
+    this->current_delayON = delayON;
+    this->current_delayOFF = 0;
+
+    if (this->current_delayON != this->last_delayON)
+    {
+        this->stop();
+        this->start();
+    }
+}
+void LED_ON()
+{
+    digitalWrite(this->pin, HIGH);
+}
+
+void LED_OFF()
+{
+    digitalWrite(this->pin, LOW);
+}
+
+// bool isRunning()
+// {
+//     if (
+//         this->LED_mode == kxnTaskLED_MODE_ON ||
+//         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
+//         this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
+//         return true;
+//     else
+//         return false;
+// }
+END
 #endif

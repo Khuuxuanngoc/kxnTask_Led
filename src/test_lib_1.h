@@ -35,12 +35,13 @@ class LED_Manager
 {
 private:
     uint8_t pin;
-    uint8_t LED_current_state;
+    // uint8_t LED_current_state;
     uint8_t LED_last_state;
     bool LED_ON;
     bool LED_OFF;
 
 public:
+    uint8_t LED_current_state;
     LED_Manager(/* args */);
     ~LED_Manager();
 };
@@ -60,7 +61,7 @@ DEFINE_TASK_STATE(test_lib_1){
 
 CREATE_TASK(test_lib_1)
 /*Add your variable here*/
-// unsigned long 
+// unsigned long
 uint8_t pin;
 
 void setup(uint8_t pin_PA)
@@ -72,92 +73,116 @@ void setup(uint8_t pin_PA)
     stop();
 }
 
-
 void loop()
 {
     switch (getState())
     {
     case test_lib_1_ON:
         /*code*/
-        // if ()
-        digitalWrite(this->pin, HIGH);
-        kDelay(1000);
-        setState(test_lib_1_OFF);
+
+        if (ptr->LED_current_state == this->LED_ON_1_TIMES)
+        {
+            digitalWrite(this->pin, HIGH);
+            kDelay(this->current_delayON);
+            setState(test_lib_1_OFF);
+            // digitalWrite(this->pin, LOW);
+            // setStateIdle();
+        }
         break;
 
     case test_lib_1_OFF:
         /*code*/
-        digitalWrite(this->pin, LOW);
-        kDelay(1000);
-        setState(test_lib_1_ON);
-        break;
+        // digitalWrite(this->pin, LOW);
+        // kDelay(1000);
+        // setState(test_lib_1_ON);
+        if (ptr->LED_current_state == this->LED_ON_1_TIMES)
+        {
+            digitalWrite(this->pin, LOW);
+            setStateIdle();
+        }
+            // kDelay(this->current_delayON);
+            // setState(test_lib_1_OFF);
+            break;
 
-    default:
-        break;
+        default:
+            break;
+        }
     }
-}
 
-void start()
-{
-    kxnTaskManager.add(this);
-    setState(test_lib_1_ON);
-}
+    void start()
+    {
+        kxnTaskManager.add(this);
+        setState(test_lib_1_ON);
+    }
 
-void stop()
-{
-    kDelay(0);
-    setStateIdle();
-}
+    void stop()
+    {
+        kDelay(0);
+        setStateIdle();
+    }
 
-void runFast()
-{
-}
+    void runFast()
+    {
+    }
 
-// void write(unsigned long delayON, unsigned long delayOFF)
-// {
-//     if (this->LED_mode != kxnTaskLED_MODE_ON)
-//     {
-//         this->start();
-//         this->LED_mode = kxnTaskLED_MODE_ON;
-//         setState(kxnTaskLED_ON);
-//         this->timeDelayON = delayON;
-//         this->timeDelayOFF = delayOFF;
-//     }
-// }
+    // void write(unsigned long delayON, unsigned long delayOFF)
+    // {
+    //     if (this->LED_mode != kxnTaskLED_MODE_ON)
+    //     {
+    //         this->start();
+    //         this->LED_mode = kxnTaskLED_MODE_ON;
+    //         setState(kxnTaskLED_ON);
+    //         this->timeDelayON = delayON;
+    //         this->timeDelayOFF = delayOFF;
+    //     }
+    // }
 
-// void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
-// {
-//     if (this->LED_mode != kxnTaskLED_MODE_ON_COUNT)
-//     {
-//         this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
-//         this->countOFF = countOFF;
-//         this->start();
-//         setState(kxnTaskLED_ON_COUNT);
-//         this->timeDelayON = delayON;
-//         this->timeDelayOFF = delayOFF;
-//     }
-// }
+    // void write(unsigned long delayON, unsigned long delayOFF, uint8_t countOFF)
+    // {
+    //     if (this->LED_mode != kxnTaskLED_MODE_ON_COUNT)
+    //     {
+    //         this->LED_mode = kxnTaskLED_MODE_ON_COUNT;
+    //         this->countOFF = countOFF;
+    //         this->start();
+    //         setState(kxnTaskLED_ON_COUNT);
+    //         this->timeDelayON = delayON;
+    //         this->timeDelayOFF = delayOFF;
+    //     }
+    // }
 
-// void write(unsigned long delayON)
-// {
-//     if (this->LED_mode != kxnTaskLED_MODE_ON_1TIMES)
-//     {
-//         this->LED_mode = kxnTaskLED_MODE_ON_1TIMES;
-//         this->start();
-//         setState(kxnTaskLED_ON_1TIMES);
-//         this->timeDelayON = delayON;
-//     }
-// }
+    // Bật một lần xong rồi tắt
 
-// bool isRunning()
-// {
-//     if (
-//         this->LED_mode == kxnTaskLED_MODE_ON ||
-//         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
-//         this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
-//         return true;
-//     else
-//         return false;
-// }
-END
+    typedef enum
+    {
+        LED_ON_1_TIMES = 100,
+    } LED_state;
+
+    LED_Manager led_manager;
+    LED_Manager *ptr = &led_manager;
+    unsigned long current_delayON, last_delayON;
+    void write(unsigned long delayON)
+    {
+        ptr->LED_current_state = this->LED_ON_1_TIMES;
+
+        this->last_delayON = this->current_delayON;
+
+        this->current_delayON = delayON;
+
+        if (this->current_delayON != this->last_delayON)
+        {
+            this->start();
+        }
+    }
+
+    // bool isRunning()
+    // {
+    //     if (
+    //         this->LED_mode == kxnTaskLED_MODE_ON ||
+    //         this->LED_mode == kxnTaskLED_MODE_ON_1TIMES ||
+    //         this->LED_mode == kxnTaskLED_MODE_ON_COUNT)
+    //         return true;
+    //     else
+    //         return false;
+    // }
+    END
 #endif

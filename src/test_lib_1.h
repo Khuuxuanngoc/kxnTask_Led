@@ -162,6 +162,7 @@ void loop()
     unsigned long current_delayON, last_delayON;
     void write(unsigned long delayON)
     {
+        
         ptr->LED_current_state = this->LED_ON_1_TIMES;
 
         this->last_delayON = this->current_delayON;
@@ -170,6 +171,7 @@ void loop()
 
         if (this->current_delayON != this->last_delayON)
         {
+            this->stop();
             this->start();
         }
     }

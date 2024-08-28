@@ -51,8 +51,9 @@ typedef enum
 
 } LED_working_state;
 
-typedef enum {
-    LED_IDLE = 90, 
+typedef enum
+{
+    LED_IDLE = 90,
     LED_WORKING,
 } LED_state;
 
@@ -87,7 +88,6 @@ void loop()
             // {
             //     this
             // }
-            
         }
         else
         {
@@ -110,6 +110,10 @@ void start()
 
 void stop()
 {
+    this->last_delayON = 10;
+    this->last_delayOFF = 200;
+    this->current_delayON = 0;
+    this->current_delayOFF = 0;
     kDelay(0);
     setStateIdle();
 }
@@ -138,7 +142,7 @@ void write(unsigned long delayON, unsigned long delayOFF)
 // Nhấp nháy theo số lần rồi tắt
 void write(unsigned long delayON, unsigned long delayOFF, uint8_t _count)
 {
-    this->count=_count;
+    this->count = _count;
 
     this->LED_current_state = this->LED_ON_LOOP_FORTIMES;
 
@@ -156,20 +160,27 @@ void write(unsigned long delayON, unsigned long delayOFF, uint8_t _count)
 // Bật một lần xong rồi tắt
 void write(unsigned long delayON)
 {
+
+    if (isStateIdle())
+    {
+        /* code */
+        this->current_delayON = delayON;
+        this->start();
+    }
     
     // if (this->LED_current_state != this->LED_ON_1_TIMES)
     // this->LED_current_state = this->LED_ON_1_TIMES;
 
-    this->last_delayON = this->current_delayON;
-    this->last_delayOFF = this->current_delayOFF;
-    this->current_delayON = delayON;
-    this->current_delayOFF = 0;
+    // this->last_delayON = this->current_delayON;
+    // this->last_delayOFF = this->current_delayOFF;
+    // this->current_delayON = delayON;
+    // this->current_delayOFF = 0;
 
-    if (this->current_delayON != this->last_delayON)
-    {
-        this->stop();
-        this->start();
-    }
+    // if (this->current_delayON != this->last_delayON)
+    // {
+    //     this->stop();
+        // this->start();
+    // }
 }
 void LED_ON()
 {
@@ -186,8 +197,7 @@ bool isRunning()
     if (
         this->LED_current_state == LED_ON_1_TIMES ||
         this->LED_current_state == LED_ON_LOOP_FOREVER ||
-        this->LED_current_state == LED_ON_LOOP_FORTIMES
-        )
+        this->LED_current_state == LED_ON_LOOP_FORTIMES)
         return true;
     else
         return false;

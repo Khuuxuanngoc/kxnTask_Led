@@ -1,4 +1,4 @@
-class test_serial {
+/* class test_serial {
 public:
   String Str = "", timeON, timeOFF;
   void setup() {
@@ -21,4 +21,4 @@ public:
   void loop() {
     //
   }
-};
+}; */

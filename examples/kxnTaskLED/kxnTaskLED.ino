@@ -1,45 +1,53 @@
-#include "kxnTaskLED.h"
-#define KDEBUGLN(NAME) Serial.println(NAME)
-#define KDEBUG(NAME) Serial.print(NAME)
-kxnTaskLED LED1;
-String Str = "", timeON = "", timeOFF = "";
-// void setup() {
-//   Serial.begin(9600);
-// }
+// #include "kxnTaskLED1.h"
+// #include "kxnTaskLED2.h"
+#include "kxnTaskLED3.h"
+// ONETIMES LED;
+// FOREVER LED;
+FORTIMES LED;
+unsigned long currentMillis = 0, lastMillis = 0, interval = 1000;
+unsigned long thatTimeMillis = 0;
+long value1, value2, value3;
 
-// void test_Serial()
-// {
-//   if (Serial.available())
-//   {
-//     Str = Serial.readStringUntil('\n');
-
-//     int firstSpace = Str.indexOf(' ');
-//     timeON = Str.substring(0, firstSpace);
-//     timeOFF = Str.substring(firstSpace + 1);
-
-//     Serial.println("the ON times of the led is " + timeON);
-//     Serial.println("the OFF times of the led is " + timeOFF);
-//   }
-// }
-void setup() {
-  Serial.begin(9600);
-  LED1.setup(10);
-  LED1.write(2000);
+void setup()
+{
+    Serial.begin(9600);
+    LED.setup(LED_BUILTIN,0);
+    // LED.write(5000);
+    // thatTimeMillis = 0;
 }
-void loop() {
-
-  // LED1.write(2000);
-  // KDEBUGLN(LED1.isRunning());
-  LED1.write(1000,1000,2);
-  kxnTaskManager.run(millis());
-  // khanhDelay(10000);
-
-  // LED1.write(timeON.toInt(),timeOFF.toInt(),2);
+void loop()
+{
+    testSerial();
+    LED.write(value1, value2, value3);
+    khanhDelay(10000);
+    // kxnTaskManager.run(millis());
 }
 
-void khanhDelay(unsigned long Time) {
-  if (millis() <= millis() + Time) {
-    // test_Serial();
-    kxnTaskManager.run(millis());
-  }
+void khanhDelay(unsigned long Time)
+{
+    while (millis() <= millis() + Time)
+    {
+        Serial.print("in delay: ");
+        Serial.println(Time);
+        kxnTaskManager.run(millis());
+        currentMillis = millis();
+        if (currentMillis - lastMillis >= interval)
+        {
+            lastMillis = millis();
+            Time -= 1000;
+            if (Time < 0)
+            {
+                Time = 0;
+            }
+        }
+    }
+}
+
+void testSerial()
+{
+    if (Serial.available())
+    {
+        String inputText = Serial.readStringUntil('\n');
+        sscanf(inputText.c_str(), "%ld %ld %ld", &value1, &value2, &value3);
+    }
 }

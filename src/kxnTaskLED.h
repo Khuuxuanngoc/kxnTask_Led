@@ -122,7 +122,6 @@ void write(unsigned long timeON)
 
 void resetAllPa()
 {
-    // this->level = 1;
     this->timeON = 0;
     this->timeOFF = 0;
     this->count = 0;

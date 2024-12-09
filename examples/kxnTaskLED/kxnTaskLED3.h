@@ -2,13 +2,13 @@
 
 #include "kxnTask.h"
 
-DEFINE_TASK_STATE(kxnTaskLED){
-    kxnTaskLED_ON,
-    kxnTaskLED_OFF,
-    kxnTaskLED_IDLE,
+DEFINE_TASK_STATE(FORTIMES){
+    FORTIMES_ON,
+    FORTIMES_OFF,
+    FORTIMES_IDLE,
 };
 
-CREATE_TASK(kxnTaskLED)
+CREATE_TASK(FORTIMES)
 byte pin = 0;
 unsigned long timeON = 0, timeOFF = 0;
 int8_t count = 0, counts = 0;
@@ -34,22 +34,22 @@ void loop()
 {
     switch (getState())
     {
-    case kxnTaskLED_ON:
+    case FORTIMES_ON:
         this->LED_ON();
         kDelay(this->timeON);
-        setState(kxnTaskLED_OFF);
+        setState(FORTIMES_OFF);
         break;
 
-    case kxnTaskLED_OFF:
+    case FORTIMES_OFF:
         this->LED_OFF();
         kDelay(this->timeOFF);
         if (this->count >= 0 && ++this->counts >= this->count)
-            setState(kxnTaskLED_IDLE);
+            setState(FORTIMES_IDLE);
         else
-            setState(kxnTaskLED_ON);
+            setState(FORTIMES_ON);
         break;
 
-    case kxnTaskLED_IDLE:
+    case FORTIMES_IDLE:
         this->resetAllPa();
         this->stop();
         break;
@@ -61,7 +61,7 @@ void loop()
 void start()
 {
     kxnTaskManager.add(this);
-    setState(kxnTaskLED_ON);
+    setState(FORTIMES_ON);
 }
 
 void stop()
@@ -93,6 +93,7 @@ void write(unsigned long timeON, unsigned long timeOFF, int8_t count)
     {
         if (this->timeON != timeON || this->timeOFF != timeOFF || this->count != count)
         {
+            this->resetAllPa();
             this->timeON = timeON;
             this->timeOFF = timeOFF;
             this->count = count;
@@ -111,14 +112,13 @@ void write(unsigned long timeON, unsigned long timeOFF, int8_t count)
 
 void write(unsigned long timeON, unsigned long timeOFF)
 {
-    write(timeON,timeOFF,-1);
+    write(timeON, timeOFF, -1);
 }
 
 void write(unsigned long timeON)
 {
-    write(timeON,0,0);
+    write(timeON, 0, 0);
 }
-
 
 void resetAllPa()
 {
@@ -129,7 +129,7 @@ void resetAllPa()
 }
 bool isRunning()
 {
-    if (getState() == kxnTaskLED_ON || getState() == kxnTaskLED_OFF)
+    if (getState() == FORTIMES_ON || getState() == FORTIMES_OFF)
 
         return true;
     else
@@ -137,12 +137,12 @@ bool isRunning()
 }
 END
 
-/**
- * y240901 
- * 00:00
- * Complete testing in void loop().
- * 00:19
- * Complete testing in void loop() with Serial.
- * 00:23
- * Complete testing in void loop() with Serial and change level = 0. rename this class and public.
- */
+    /**
+     * y240901
+     * 00:00
+     * Complete testing in void loop().
+     * 00:19
+     * Complete testing in void loop() with Serial.
+     *
+     *
+     */
